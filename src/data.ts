@@ -41,7 +41,7 @@ export const HOME_OFFERS: OfferCard[] = [
     alt: "Members collaborating on engineering tasks",
   },
   {
-    title: "Professional Development Program",
+    title: "Professional Development",
     body:
       "By engaging with industry mentors and companies, members can showcase contributions, receive referrals to top firms, and strengthen networking skills during lecture series events—opening doors to prestigious career opportunities.",
     image: "/offer-professional.jpg",

@@ -34,11 +34,13 @@ import { AIR_BRUTUS_ANNOTATIONS, type Annotation, PAST_SEASONS } from "./data";
 // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
 import { Canvas, useLoader, useFrame, useThree } from "@react-three/fiber";
 import { Html, useProgress } from "@react-three/drei";
-// Vite-friendly STL loader
-// eslint-disable-next-line import/no-absolute-path
-import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
-import { Vector3, DoubleSide } from "three";
-import type { BufferGeometry } from "three";
+// GLB loader
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+import { Box3, Vector3 } from "three";
 
 /**
  * App structure
@@ -124,7 +126,7 @@ function Header({ overlay }: { overlay: boolean }) {
             to="/get-involved"
             className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
-            Get involved
+            Get involved <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -228,7 +230,7 @@ function Home() {
               <h2 className="text-2xl sm:text-3xl font-semibold">{HOME_COMPETITION.heading}</h2>
               <p className="mt-4 text-black/70 dark:text-neutral-400 leading-relaxed">{HOME_COMPETITION.body}</p>
             </div>
-            <div className="rounded-2xl border border-black/10 p-5 bg-white">
+            <div className="rounded-2xl border border-black/10 dark:border-white/10 p-5 bg-white dark:bg-neutral-900">
               <h3 className="text-lg font-semibold">This year’s mission</h3>
               <ul className="mt-3 space-y-2 text-sm text-black/70 dark:text-neutral-400">
                 {HOME_COMPETITION.bullets.map((b: string) => (
@@ -243,7 +245,7 @@ function Home() {
       {/* JOIN CTA */}
       <section id="join-home" className="border-t border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="rounded-2xl border border-black/10 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white">
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white dark:bg-neutral-900">
             <div>
               <h3 className="text-2xl font-semibold">{HOME_JOIN.heading}</h3>
             </div>
@@ -338,8 +340,8 @@ function SubteamCardSelectable({
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.5 }}
       className={
-        "group rounded-2xl border bg-white transition overflow-hidden " +
-        (active ? "border-[#C8102E]" : "border-black/10 hover:bg-black/[0.02] dark:bg-white/[0.04]")
+        "group rounded-2xl border transition overflow-hidden " +
+        (active ? "border-[#C8102E] bg-white dark:bg-neutral-900" : "border-black/10 bg-white dark:bg-white/[0.04] hover:bg-black/[0.02] dark:hover:bg-white/[0.06]")
       }
     >
       <div className="relative aspect-[16/10] w-full bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900">
@@ -356,7 +358,7 @@ function SubteamCardSelectable({
         <p className="mt-3 text-sm text-black/70 dark:text-neutral-400">{body}</p>
         <button
           onClick={onLearnMore}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-4 py-2 text-sm font-medium text-black hover:bg-black/[0.03]"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-4 py-2 text-sm font-medium text-black dark:text-white hover:bg-black/[0.03] dark:hover:bg-white/10"
         >
           {active ? "Hide Details" : "Learn More"}
           <ArrowRight className="h-4 w-4" />
@@ -667,20 +669,8 @@ function NewsPage() {
   );
 }
 
-/* ------------------------- Air Brutus 1 (STL + annotations) ---------- */
+/* ------------------------- Air Brutus 1 (GLB + annotations) ---------- */
 function AirBrutus() {
-  const defaultView = useMemo(
-    () => ({ pos: [0, 0.5, 3.5] as [number, number, number], target: [0, 0, 0] as [number, number, number] }),
-    []
-  );
-  const focusStops = useMemo(
-    () =>
-      AIR_BRUTUS_ANNOTATIONS.map((a) => ({
-        pos: [a.position[0] + 0.6, a.position[1] + 0.4, a.position[2] + 0.8] as [number, number, number],
-        target: a.position,
-      })),
-    []
-  );
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
 
   return (
@@ -688,15 +678,13 @@ function AirBrutus() {
       <div className="rounded-2xl border border-black/10 overflow-hidden">
         <div className="relative aspect-[16/9] w-full bg-black/[0.02] dark:bg-white/[0.04]">
           <Suspense fallback={<CenterNote>Loading 3D model…</CenterNote>}>
-            <Canvas camera={{ position: defaultView.pos, fov: 55 }}>
+            <Canvas camera={{ position: [0, 0.5, 3.5], fov: 55 }}>
               <LoaderOverlay />
               <ambientLight intensity={0.7} />
               <directionalLight position={[4, 4, 4]} intensity={0.7} />
-              <ModelStl url="/air-brutus-1.stl" />
-              {AIR_BRUTUS_ANNOTATIONS.map((a, idx) => (
-                <AnnotationDot key={a.label + idx} annotation={a} onFocus={() => setFocusIndex(idx)} />
-              ))}
-              <CameraRig view={focusIndex === null ? defaultView : focusStops[focusIndex]} />
+
+              {/* Scene content lives inside Canvas so R3F hooks are valid */}
+              <AirBrutusScene focusIndex={focusIndex} onFocus={setFocusIndex} />
             </Canvas>
           </Suspense>
           {focusIndex !== null && (
@@ -711,6 +699,79 @@ function AirBrutus() {
       </div>
       <p className="mt-4 text-sm text-black/60 dark:text-neutral-500">Click a dot to focus on a component and see its description.</p>
     </PageShell>
+  );
+}
+
+function AirBrutusScene({ focusIndex, onFocus }: { focusIndex: number | null; onFocus: (i: number) => void }) {
+  const modelUrl = import.meta.env.VITE_MODEL_URL ?? "/air-brutus-1.glb";
+  const gl = useThree((s) => s.gl);
+  const gltf = useLoader(GLTFLoader, modelUrl, (ldr) => {
+    const draco = new DRACOLoader();
+    draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+    (ldr as GLTFLoader).setDRACOLoader(draco);
+
+    const ktx2 = new KTX2Loader();
+    ktx2.setTranscoderPath("https://www.gstatic.com/basis-universal/1.0.0/");
+    try { (ktx2 as any).detectSupport?.(gl); } catch {}
+    (ldr as any).setKTX2Loader?.(ktx2);
+
+    (ldr as any).setMeshoptDecoder?.(MeshoptDecoder as any);
+    
+  }) as GLTF;
+
+  // Normalize scene: center and scale so camera/annotations align
+  const norm = useMemo(() => {
+    const scene = gltf.scene.clone(true);
+    const box = new Box3().setFromObject(scene);
+    const c = box.getCenter(new Vector3());
+    const size = box.getSize(new Vector3());
+    const r = Math.max(size.x, size.y, size.z) * 0.5 || 1;
+    const scale = 1.2 / r;
+    scene.position.sub(c);
+    scene.scale.setScalar(scale);
+    const transform = (p: [number, number, number]) => (
+      [(p[0] - c.x) * scale, (p[1] - c.y) * scale, (p[2] - c.z) * scale] as [number, number, number]
+    );
+    return { scene, transform };
+  }, [gltf]);
+
+  // Transform annotations into normalized space
+  const tAnn = useMemo(() => (
+    AIR_BRUTUS_ANNOTATIONS.map((a) => ({
+      ...a,
+      tpos: norm.transform(a.position as [number, number, number]),
+    }))
+  ), [norm]);
+
+  const defaultView = useMemo(
+    () => ({ pos: [0, 0.5, 3.5] as [number, number, number], target: [0, 0, 0] as [number, number, number] }),
+    []
+  );
+
+  const focusStops = useMemo(() => (
+    tAnn.map((a) => ({
+      pos: [a.tpos[0] + 0.6, a.tpos[1] + 0.4, a.tpos[2] + 0.8] as [number, number, number],
+      target: a.tpos as [number, number, number],
+    }))
+  ), [tAnn]);
+
+  return (
+    <>
+      {/* Normalized GLB scene */}
+      <primitive object={norm.scene} />
+
+      {/* Annotations in normalized space */}
+      {tAnn.map((a, idx) => (
+        <AnnotationDot
+          key={a.label + idx}
+          annotation={{ label: a.label, description: a.description, position: a.tpos as [number, number, number] }}
+          onFocus={() => onFocus(idx)}
+        />
+      ))}
+
+      {/* Camera controller */}
+      <CameraRig view={focusIndex === null ? defaultView : focusStops[focusIndex]} />
+    </>
   );
 }
 
@@ -729,31 +790,13 @@ function CenterNote({ children }: { children: ReactNode }) {
   );
 }
 
-function ModelStl({ url }: { url: string }) {
-  const geom = useLoader(STLLoader, url) as BufferGeometry;
-  const { g, scale } = useMemo(() => {
-    const g = geom.clone();
-    g.computeVertexNormals();
-    g.center();
-    g.computeBoundingSphere();
-    const r = g.boundingSphere?.radius || 1;
-    const scale = 1.2 / r; // normalize to a comfortable size
-    return { g, scale };
-  }, [geom]);
-  return (
-    <mesh geometry={g} scale={scale} castShadow receiveShadow>
-      <meshStandardMaterial color="#999" metalness={0.1} roughness={0.8} side={DoubleSide} />
-    </mesh>
-  );
-}
-
 function LoaderOverlay() {
   const { active, progress, item, errors } = useProgress();
   if (!active && (!errors || errors.length === 0)) return null;
   return (
     <Html center>
       <div className="rounded-lg bg-white/90 dark:bg-neutral-900/90 px-3 py-2 text-xs text-black dark:text-white shadow">
-        {active ? `Loading… ${Math.round(progress)}%` : "Failed to load model (check /air-brutus-1.stl)"}
+        {active ? `Loading… ${Math.round(progress)}%` : "Failed to load model (check VITE_MODEL_URL or /air-brutus-1.glb)"}
         {item ? <div className="mt-1 opacity-70">{item}</div> : null}
       </div>
     </Html>
@@ -823,6 +866,14 @@ function AvionicsPage() {
   );
 }
 
+function NewsPageStub() {
+  return (
+    <PageShell title="News">
+      <p className="text-black/70 dark:text-neutral-400">Monthly updates coming soon.</p>
+    </PageShell>
+  );
+}
+
 function PastSeasons() {
   return (
     <PageShell title="Past Seasons">
@@ -879,22 +930,95 @@ function Partners() {
 }
 
 function GetInvolved() {
+  // NOTE: replace this with your real Slack invite URL if available
+  const SLACK_URL = "https://join.slack.com";
+
   return (
     <PageShell title="Get Involved">
-      <p className="text-black/70 dark:text-neutral-400 max-w-3xl">
-        Applications open each semester. No prior experience required—bring curiosity, grit, and a passion for flight.
-      </p>
-      <div className="mt-6 flex gap-3">
-        <a className="rounded-xl bg-[#C8102E] px-5 py-3 font-medium text-white hover:opacity-90" href="#">
-          Apply Now
-        </a>
-        <a className="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-5 py-3 font-medium hover:bg-black/[0.03]" href="#">
-          Contact Us
-        </a>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Left: Meeting Times + Contact */}
+        <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 p-6">
+          <h2 className="text-xl font-semibold">Meeting Times</h2>
+          <div className="mt-4 space-y-4 text-sm text-black/80 dark:text-neutral-200">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-medium">Monday</div>
+                <div className="text-black/70">Avionics</div>
+              </div>
+              <div className="font-medium">6PM–8PM</div>
+            </div>
+
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-medium">Tuesday</div>
+                <div className="text-black/70">Software</div>
+              </div>
+              <div className="font-medium">6PM–8PM</div>
+            </div>
+
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-medium">Wednesday</div>
+                <div className="text-black/70">Full Team</div>
+              </div>
+              <div className="font-medium">6PM–8PM</div>
+            </div>
+
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-medium">Thursday</div>
+                <div className="text-black/70">Structures</div>
+              </div>
+              <div className="font-medium">6PM–8PM</div>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-black/5 pt-4 text-sm text-black/70 dark:text-neutral-400">
+            <div className="font-medium">Contact</div>
+            <p className="mt-2 text-sm text-black/70 dark:text-neutral-400">For questions or to get involved, email us at:</p>
+            <div className="mt-2">
+              <a href="mailto:buckeyevertical@buckeyemail.osu.edu" className="text-[#C8102E] hover:underline">buckeyevertical@buckeyemail.osu.edu</a>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <a
+              href={SLACK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Join our Slack
+            </a>
+          </div>
+        </div>
+
+        {/* Right: Location + Map */}
+        <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 p-6">
+          <h2 className="text-xl font-semibold">Meeting Location</h2>
+          <div className="mt-4 text-sm text-black/80 dark:text-neutral-200">
+            <div className="font-medium">Scott Laboratory W092</div>
+            <div>201 W 19th Ave,</div>
+            <div>Columbus, OH 43210</div>
+          </div>
+
+          <div className="mt-4">
+            <div className="overflow-hidden rounded-lg border border-black/10">
+              <iframe
+                title="Scott Laboratory map"
+                src="https://www.google.com/maps?q=Scott+Laboratory+W092+201+W+19th+Ave+Columbus+OH+43210&output=embed"
+                className="w-full h-56 border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </PageShell>
   );
 }
+
 
 function HeroImagePlaceholder({ label }: { label: string }) {
   return (
