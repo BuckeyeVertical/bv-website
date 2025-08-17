@@ -878,13 +878,6 @@ function AvionicsPage() {
   );
 }
 
-function NewsPageStub() {
-  return (
-    <PageShell title="News">
-      <p className="text-black/70 dark:text-neutral-400">Monthly updates coming soon.</p>
-    </PageShell>
-  );
-}
 
 function PastSeasons() {
   return (
