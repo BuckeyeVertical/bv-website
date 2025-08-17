@@ -11,6 +11,7 @@ import {
   type SubteamKey,
   type Details,
   type DetailSection,
+  INDUSTRY_PARTNERS,
 } from "./data";
 import {
   HOME_ABOUT,
@@ -29,6 +30,7 @@ import {
   type LectureStat,
   type FeaturedCompany,
   type LectureNewsItem,
+  SLACK_URL,
 } from "./data";
 import { AIR_BRUTUS_ANNOTATIONS, type Annotation, PAST_SEASONS } from "./data";
 // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
@@ -100,23 +102,24 @@ function Header({ overlay }: { overlay: boolean }) {
       className={[
         "z-50",
         overlay
-          ? "fixed top-4 left-4 right-4"
-          : "sticky top-0 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10",
+          ? "fixed top-4 left-4 right-4 h-16"
+          : "sticky top-0 h-16 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10",
       ].join(" ")}
     >
-      <div className="mx-auto max-w-7xl flex items-center justify-between px-3 sm:px-6">
+      <div className="mx-auto max-w-7xl flex items-center justify-between px-3 sm:px-6 h-full">
         {/* Left: Logo + TOC */}
         <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2" aria-label="Buckeye Vertical — Home">
-            <img src="/logo.svg" alt="Buckeye Vertical logo" className="h-7 w-auto" />
+          <Link to="/" className="flex items-center gap-3" aria-label="Buckeye Vertical  Home">
+            {/* Rounded square background so transparent logo is visible */}
+            <div className="w-14 h-14 rounded-md flex items-center justify-center bg-neutral-50 border border-black/10 shadow-sm p-2">
+              <img src="/logo.png" alt="Buckeye Vertical logo" className="h-10 w-auto object-contain" />
+            </div>
             <span className="sr-only">Buckeye Vertical</span>
           </Link>
           <nav className="hidden md:flex flex-wrap gap-2 ml-2">
             {NAV.filter((i: NavItem) => i.to !== "/get-involved" && i.label.toLowerCase() !== "get involved").map((i: NavItem) => (
               <Pill key={i.to} to={i.to} label={i.label} />
             ))}
-            {!NAV.some((i) => i.to === "/news") && <Pill to="/news" label="News" />}
-            {!NAV.some((i) => i.to === "/air-brutus-1") && <Pill to="/air-brutus-1" label="Air Brutus 1" />}
           </nav>
         </div>
 
@@ -296,6 +299,7 @@ function Subteams() {
             title={c.title}
             subtitle={c.subtitle}
             body={c.body}
+            image={c.image}
             icon={ICONS[c.icon]}
             active={active === c.id}
             onLearnMore={() => setActive(active === c.id ? null : c.id)}
@@ -322,6 +326,7 @@ function SubteamCardSelectable({
   title,
   subtitle,
   body,
+  image,
   icon,
   active,
   onLearnMore,
@@ -329,6 +334,7 @@ function SubteamCardSelectable({
   title: string;
   subtitle: string;
   body: string;
+  image?: string;
   icon: ReactNode;
   active: boolean;
   onLearnMore: () => void;
@@ -345,9 +351,15 @@ function SubteamCardSelectable({
       }
     >
       <div className="relative aspect-[16/10] w-full bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900">
-        <div className="absolute inset-0 flex items-center justify-center text-black/60 dark:text-neutral-500 text-sm">
-          {subtitle}
-        </div>
+        {
+          image ? (
+            <img src={image} alt={subtitle} className="h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-black/60 dark:text-neutral-500 text-sm">
+              {subtitle}
+            </div>
+          )
+        }
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
       </div>
       <div className="p-5">
@@ -522,27 +534,27 @@ function LectureSeries() {
     <PageShell title="Lecture Series">
       {/* Featured companies — logo wall */}
       <section>
-        <h2 className="text-xl font-semibold">Companies we've hosted</h2>
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-          {LECTURE_FEATURED.map((c: FeaturedCompany) => (
-            c.url ? (
-              <a key={c.name} href={c.url} className="group rounded-xl border border-black/10 bg-gradient-to-b from-black/[0.02] to-white dark:from-white/[0.04] dark:to-neutral-900 p-4 flex items-center justify-center" aria-label={c.name}>
-                <img
-                  src={c.logo}
-                  alt={c.name}
-                  className="h-8 w-auto filter grayscale opacity-70 transition group-hover:grayscale-0 group-hover:opacity-100"
-                />
-              </a>
-            ) : (
-              <div key={c.name} className="rounded-xl border border-black/10 bg-gradient-to-b from-black/[0.02] to-white dark:from-white/[0.04] dark:to-neutral-900 p-4 flex items-center justify-center">
-                <img
-                  src={c.logo}
-                  alt={c.name}
-                  className="h-8 w-auto filter grayscale opacity-70"
-                />
-              </div>
-            )
-          ))}
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Companies we've hosted</h2>
+        </div>
+        <div className="mt-8 flex justify-center">
+          <div className="w-full max-w-6xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center">
+            {LECTURE_FEATURED.map((c: FeaturedCompany) => (
+              c.url ? (
+                <a key={c.name} href={c.url} className="flex items-center justify-center" aria-label={c.name}>
+                  <div className="w-full h-20 flex items-center justify-center rounded-lg bg-neutral-50 border border-black/10 p-4 shadow-sm">
+                    <img src={c.logo} alt={c.name} className="max-h-14 w-auto object-contain" />
+                  </div>
+                </a>
+              ) : (
+                <div key={c.name} className="flex items-center justify-center">
+                  <div className="w-full h-20 flex items-center justify-center rounded-lg bg-neutral-50 border border-black/10 p-4 shadow-sm">
+                    <img src={c.logo} alt={c.name} className="max-h-14 w-auto object-contain" />
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
         </div>
       </section>
 
@@ -913,16 +925,39 @@ function PastSeasons() {
 function Partners() {
   return (
     <PageShell title="Industry Partners">
-      <HeroImagePlaceholder label="Partner logos" />
-      <p className="mt-6 text-black/70 dark:text-neutral-400 max-w-3xl">
-        We collaborate with companies and labs across aerospace, robotics, and AI. Interested in partnering? Let’s talk.
-      </p>
-      <div className="mt-6">
+      <div className="text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold">Our Industry Partners</h2>
+        <p className="mt-3 text-sm text-black/70 dark:text-neutral-400 max-w-3xl mx-auto">We collaborate with companies and labs across aerospace, robotics, and AI.</p>
+      </div>
+
+      <div className="mt-8 flex justify-center">
+        <div className="w-full max-w-6xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center">
+          {INDUSTRY_PARTNERS.map((c: FeaturedCompany) => (
+            c.url ? (
+              <a key={c.name} href={c.url} className="flex items-center justify-center" aria-label={c.name}>
+                <div className="w-full h-20 flex items-center justify-center rounded-lg bg-neutral-50 border border-black/10 p-4 shadow-sm">
+                  <img src={c.logo} alt={c.name} className="max-h-14 w-auto object-contain" />
+                </div>
+              </a>
+            ) : (
+              <div key={c.name} className="flex items-center justify-center">
+                <div className="w-full h-20 flex items-center justify-center rounded-lg bg-neutral-50 border border-black/10 p-4 shadow-sm">
+                  <img src={c.logo} alt={c.name} className="max-h-14 w-auto object-contain" />
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+
+  {/* Sponsors row removed per request - logos hidden */}
+
+      <div className="mt-12 flex justify-center">
         <Link
           to="/get-involved"
-          className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
         >
-          Become a partner <ArrowRight className="h-4 w-4" />
+          We're looking for sponsors
         </Link>
       </div>
     </PageShell>
@@ -930,9 +965,6 @@ function Partners() {
 }
 
 function GetInvolved() {
-  // NOTE: replace this with your real Slack invite URL if available
-  const SLACK_URL = "https://join.slack.com";
-
   return (
     <PageShell title="Get Involved">
       <div className="grid gap-6 md:grid-cols-2">

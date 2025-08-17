@@ -76,8 +76,8 @@ export const NAV: NavItem[] = [
     { label: "Past Seasons", to: "/past-seasons" },
     { label: "Industry Partners", to: "/partners" },
     { label: "Get Involved", to: "/get-involved" },
-    { label: "News", to: "/news" },
-    { label: "Air Brutus 1", to: "/air-brutus-1" },
+    // { label: "News", to: "/news" },
+    // { label: "Air Brutus 1", to: "/air-brutus-1" },
 ];
 
 // --- Home hero ---
@@ -93,6 +93,7 @@ export const SUBTEAMS_CARDS: Array<{
   id: SubteamKey;
   title: string;
   subtitle: string;
+  image: string;
   body: string;
   icon: "cog" | "cpu" | "circuit";
 }> = [
@@ -100,6 +101,7 @@ export const SUBTEAMS_CARDS: Array<{
     id: "structures",
     title: "Structures",
     subtitle: "CAD of Air Brutus 1",
+    image: "/cad.jpg",
     body:
       "Designing, manufacturing, and assembling autonomous vehicle using CAD/CAM/Simulation and advanced manufacturing techniques",
     icon: "cog",
@@ -108,6 +110,7 @@ export const SUBTEAMS_CARDS: Array<{
     id: "software",
     title: "Software",
     subtitle: "Object Detection Model",
+    image: "/obj-det.jpg",
     body:
       "Developing robust AI, computer vision, and autonomous navigation algorithms using advanced sensor technologies.",
     icon: "cpu",
@@ -116,6 +119,7 @@ export const SUBTEAMS_CARDS: Array<{
     id: "avionics",
     title: "Avionics",
     subtitle: "Soldering Avionics System",
+    image: "/soldering.jpg",
     body:
       "Concentrate on configuring electronic systems(GPS, telemetry, power distribution, propulsion, etc) on autonomous vehicle.",
     icon: "circuit",
@@ -314,6 +318,18 @@ export const LECTURE_FEATURED: FeaturedCompany[] = [
   { name: "GE Aerospace", logo: "/logos/ge-aerospace.svg", url: "https://www.geaerospace.com/" },
 ];
 
+// Additional industry sponsors / partners (use this list for a larger logo wall)
+export const INDUSTRY_PARTNERS: FeaturedCompany[] = [
+  // Add more partner entries here. Example format:
+  { name: "Amazon", logo: "/logos/amazon.svg", url: "https://www.amazon.science/" },
+  { name: "Johns Hopkins APL", logo: "/logos/jhu-apl.svg", url: "https://www.jhuapl.edu/" },
+  { name: "GE Aerospace", logo: "/logos/ge-aerospace.svg", url: "https://www.geaerospace.com/" },
+  { name: "Avari Aerospace", logo: "/logos/avari.png", url: "https://www.avariaero.com/" },
+  { name: "Parawave", logo: "/logos/parawave.png", url: "https://parawave.us/" },
+  { name: "Boeing", logo: "/logos/boeing.svg", url: "https://www.boeing.com/" },
+  { name: "Honda", logo: "/logos/honda.svg", url: "https://www.honda.com/" },
+];
+
 // ---- Home: About the competition ----
 export const HOME_COMPETITION = {
   heading: "About our Competition",
@@ -374,7 +390,7 @@ export const PAST_SEASONS: PastSeason[] = [
   {
     year: "2023–2024",
     teamImage: "/seasons/2023-2024-team.jpg",
-    logoImage: "/logos/suas.svg",
+  logoImage: "/logos/suas.png",
     overview:
       "Building on the knowledge and skills developed from the previous year, the team once again competed in the Student Unmanned Aerial Systems Competition (SUAS). This year, Buckeye Vertical successfully completed the mission at the international competition in California, MD and placed 4th in the mission demonstration. Attending the competition for the first gave the team an opportunity to connect with all the other universities, allowing for very crucial knowledge to be shared amongst each other. The team is very excited to apply this knowledge, with their eyes set on gold for next season.",
     accomplishments: ["🏆 4th place in Mission Demonstration"],
@@ -382,7 +398,7 @@ export const PAST_SEASONS: PastSeason[] = [
   {
     year: "2022-2023",
     teamImage: "/seasons/2022-2023-team.jpg",
-    logoImage: "/logos/suas.svg",
+  logoImage: "/logos/suas.png",
     overview:
       "Coming off a winning season, the team decided to look into a more multi-disciplinary competition that would allow for the club to continue to grow. This competition was the Student Unmanned Aerial Systems Competition (SUAS). This first season served as a stepping stone, with a focus on establishing team setup and workflow for this new challenge. The team learned a tremendous amount during this season in regards to drone design and flight stability. Although Buckeye Vertical did not make it to competition, the Flight Readiness Review helped the team place 36th out of 78 schools internationally.",
     accomplishments: [
@@ -392,7 +408,7 @@ export const PAST_SEASONS: PastSeason[] = [
   {
     year: "2021-2022",
     teamImage: "/seasons/2021-2022-team.jpg",
-    logoImage: "/logos/vfs.svg",
+    logoImage: "/logos/vfs.png",
     overview:
       "Building on last season's success, our members were prepared to compete at the highest level with their gained experience. Switching from a hybrid eVTOL to a hexacopter design, the new drone secured first place overall in the Vertical Flight Society’s Design-Build-Vertical Flight Student Competition.",
     accomplishments: ["🏆 1st Place in VFS Challenge"],
@@ -400,9 +416,11 @@ export const PAST_SEASONS: PastSeason[] = [
   {
     year: "2020-2021",
     teamImage: "/seasons/2020-2021-team.jpg",
-    logoImage: "/logos/vfs.svg",
+    logoImage: "/logos/vfs.png",
     overview:
       "Buckeye Vertical was founded in 2020, marking the beginning of our journey. Despite the challenges COVID presented during the 2020–2021 academic year, our members achieved remarkable success in the Vertical Flight Society’s Inaugural Design-Build-Vertical Flight Student Competition. We placed 3rd on our Preliminary Design Report, submitted our Final Technical Report in March, and presented our eVTOL aircraft to judges in April—finishing 3rd overall.",
     accomplishments: ["🏆 3rd Place in VFS Challenge"],
   },
 ];
+
+export const SLACK_URL = "https://join.slack.com/t/buckeyevertical/shared_invite/zt-3bk9wc7no-~KXUdzrydYj3aD7urxEaXQ";
