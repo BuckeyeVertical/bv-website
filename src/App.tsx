@@ -33,16 +33,16 @@ import {
   SLACK_URL,
 } from "./data";
 import { PAST_SEASONS } from "./data";
-// 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
-import { Canvas, useLoader, useThree } from "@react-three/fiber";
-import { Html, useProgress } from "@react-three/drei";
-// GLB loader
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-import { Box3, Vector3 } from "three";
+// // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
+// import { Canvas, useLoader, useThree } from "@react-three/fiber";
+// import { Html, useProgress } from "@react-three/drei";
+// // GLB loader
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+// import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+// import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
+// import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+// import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+// import { Box3, Vector3 } from "three";
 
 /**
  * App structure
