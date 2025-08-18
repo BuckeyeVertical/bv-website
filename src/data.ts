@@ -83,7 +83,7 @@ export const NAV: NavItem[] = [
 // --- Home hero ---
 export const HERO: Hero = {
   image: "/hero.jpg",
-  headline: "Buckeye Vertical is OSU’s AI‑driven drone team building autonomous systems.",
+  headline: "Buckeye Vertical is OSU's premier aerial robotics competition team",
   tagline: "Soaring Beyond Boundaries. Engineering Tomorrow’s Skies.",
   primaryCta: { label: "Join Us", to: "/get-involved" },
 };

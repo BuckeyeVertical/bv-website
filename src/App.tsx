@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, useMemo } from "react";
+import { useState, useEffect, Suspense, useMemo, Fragment } from "react";
 import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Cpu, Cog, CircuitBoard, X } from "lucide-react";
@@ -32,10 +32,10 @@ import {
   type LectureNewsItem,
   SLACK_URL,
 } from "./data";
-import { AIR_BRUTUS_ANNOTATIONS, type Annotation, PAST_SEASONS } from "./data";
+import { PAST_SEASONS } from "./data";
 // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
-import { Canvas, useLoader, useFrame, useThree } from "@react-three/fiber";
-import { Html, useProgress } from "@react-three/drei";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import { Html, useProgress, OrbitControls } from "@react-three/drei";
 // GLB loader
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -97,6 +97,7 @@ function Layout() {
 }
 
 function Header({ overlay }: { overlay: boolean }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
   return (
     <header
       className={[
@@ -111,8 +112,8 @@ function Header({ overlay }: { overlay: boolean }) {
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-3" aria-label="Buckeye Vertical  Home">
             {/* Rounded square background so transparent logo is visible */}
-            <div className="w-14 h-14 rounded-md flex items-center justify-center bg-neutral-50 border border-black/10 shadow-sm p-2">
-              <img src="/logo.png" alt="Buckeye Vertical logo" className="h-10 w-auto object-contain" />
+            <div className="w-20 h-14 rounded-md flex items-center justify-center bg-neutral-50 border border-black/10 shadow-sm p-1">
+              <img src="/logo.svg" alt="Buckeye Vertical logo" className="h-full w-auto object-contain" />
             </div>
             <span className="sr-only">Buckeye Vertical</span>
           </Link>
@@ -125,6 +126,18 @@ function Header({ overlay }: { overlay: boolean }) {
 
         {/* Right: CTA */}
         <div className="flex items-center gap-3">
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setMobileOpen((s) => !s)}
+            className="md:hidden inline-flex items-center justify-center rounded-md bg-white/95 dark:bg-neutral-900/70 border border-black/10 dark:border-white/10 p-2"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : (
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 6h18M3 12h18M3 18h18" />
+              </svg>
+            )}
+          </button>
           <Link
             to="/get-involved"
             className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
@@ -133,6 +146,33 @@ function Header({ overlay }: { overlay: boolean }) {
           </Link>
         </div>
       </div>
+
+      {/* Mobile nav panel */}
+      {mobileOpen && (
+        <div className="md:hidden absolute inset-x-4 top-full mt-2 z-50">
+          <div className="rounded-xl border border-black/10 bg-white dark:bg-neutral-950 p-4 shadow-lg">
+            <nav className="flex flex-col gap-2">
+              {NAV.filter((i: NavItem) => i.to !== "/get-involved" && i.label.toLowerCase() !== "get involved").map((i: NavItem) => (
+                <NavLink
+                  key={i.to}
+                  to={i.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    [
+                      "w-full text-left px-3 py-2 rounded-md border text-sm",
+                      isActive
+                        ? "bg-[#C8102E] text-white border-transparent"
+                        : "bg-white/95 text-black border-black/10 hover:bg-white dark:bg-neutral-900/70 dark:text-white dark:border-white/10 dark:hover:bg-neutral-900",
+                    ].join(" ")
+                  }
+                >
+                  {i.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -272,7 +312,7 @@ function PageShell({ title, children }: { title: string; children: ReactNode }) 
   return (
     <main className="bg-white dark:bg-neutral-950">
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+  <h1 className="text-3xl font-semibold tracking-tight text-center sm:text-left">{title}</h1>
         <div className="mt-6">{children}</div>
       </section>
     </main>
@@ -291,33 +331,50 @@ function Subteams() {
 
   return (
     <PageShell title="Subteams">
-      {/* Cards */}
+      {/* Cards with inline details panel under the active card */}
       <div className="grid gap-6 md:grid-cols-3">
-        {SUBTEAMS_CARDS.map((c: (typeof SUBTEAMS_CARDS)[number]) => (
-          <SubteamCardSelectable
-            key={c.id}
-            title={c.title}
-            subtitle={c.subtitle}
-            body={c.body}
-            image={c.image}
-            icon={ICONS[c.icon]}
-            active={active === c.id}
-            onLearnMore={() => setActive(active === c.id ? null : c.id)}
-          />
+  {SUBTEAMS_CARDS.map((c: (typeof SUBTEAMS_CARDS)[number]) => (
+          <Fragment key={c.id}>
+            <SubteamCardSelectable
+              title={c.title}
+              subtitle={c.subtitle}
+              body={c.body}
+              image={c.image}
+              icon={ICONS[c.icon]}
+              active={active === c.id}
+              onLearnMore={() => setActive(active === c.id ? null : c.id)}
+            />
+
+            {/* Insert the details panel immediately after the clicked card (span full grid) */}
+            {active === c.id && (
+              <div className="col-span-full md:hidden">
+                <AnimatePresence initial={false} mode="wait">
+                  <DetailsPanel
+                    key={active}
+                    title={c.title}
+                    details={SUBTEAM_DETAILS[active]}
+                    onClose={() => setActive(null)}
+                  />
+                </AnimatePresence>
+              </div>
+            )}
+          </Fragment>
         ))}
       </div>
 
-      {/* Shared details panel below cards */}
-      <AnimatePresence initial={false} mode="wait">
-        {active && (
-          <DetailsPanel
-            key={active}
-            title={SUBTEAMS_CARDS.find((c) => c.id === active)!.title}
-            details={SUBTEAM_DETAILS[active]}
-            onClose={() => setActive(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Desktop: shared details panel below all cards (hidden on mobile) */}
+      <div className="hidden md:block mt-6">
+        <AnimatePresence initial={false} mode="wait">
+          {active && (
+            <DetailsPanel
+              key={active}
+              title={SUBTEAMS_CARDS.find((c) => c.id === active)!.title}
+              details={SUBTEAM_DETAILS[active]}
+              onClose={() => setActive(null)}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </PageShell>
   );
 }
@@ -555,6 +612,7 @@ function LectureSeries() {
               )
             ))}
           </div>
+          
         </div>
       </section>
 
@@ -747,25 +805,12 @@ function AirBrutusScene({ focusIndex, onFocus }: { focusIndex: number | null; on
     return { scene, transform };
   }, [gltf]);
 
-  // Transform annotations into normalized space
-  const tAnn = useMemo(() => (
-    AIR_BRUTUS_ANNOTATIONS.map((a) => ({
-      ...a,
-      tpos: norm.transform(a.position as [number, number, number]),
-    }))
-  ), [norm]);
 
   const defaultView = useMemo(
     () => ({ pos: [0, 0.5, 3.5] as [number, number, number], target: [0, 0, 0] as [number, number, number] }),
     []
   );
 
-  const focusStops = useMemo(() => (
-    tAnn.map((a) => ({
-      pos: [a.tpos[0] + 0.6, a.tpos[1] + 0.4, a.tpos[2] + 0.8] as [number, number, number],
-      target: a.tpos as [number, number, number],
-    }))
-  ), [tAnn]);
 
   return (
     <>
@@ -787,14 +832,7 @@ function AirBrutusScene({ focusIndex, onFocus }: { focusIndex: number | null; on
   );
 }
 
-function CameraRig({ view }: { view: { pos: [number, number, number]; target: [number, number, number] } }) {
-  const { camera } = useThree();
-  useFrame(() => {
-    camera.position.lerp(new Vector3(view.pos[0], view.pos[1], view.pos[2]), 0.08);
-    camera.lookAt(view.target[0], view.target[1], view.target[2]);
-  });
-  return null;
-}
+// CameraRig and AnnotationDot removed — AirBrutus page uses OrbitControls only.
 
 function CenterNote({ children }: { children: ReactNode }) {
   return (
@@ -815,36 +853,7 @@ function LoaderOverlay() {
   );
 }
 
-function AnnotationDot({ annotation, onFocus }: { annotation: Annotation; onFocus: () => void }) {
-  const [open, setOpen] = useState(false);
-  const { position, label, description } = annotation;
-  const handleClick = (e: any) => {
-    e.stopPropagation();
-    setOpen(true);
-    onFocus();
-  };
-  return (
-    <group position={position as any}>
-      <mesh onClick={handleClick}>
-        <sphereGeometry args={[0.02, 16, 16]} />
-        <meshStandardMaterial color="#C8102E" emissive="#C8102E" emissiveIntensity={0.2} />
-      </mesh>
-      <Html distanceFactor={8} style={{ pointerEvents: "none" }}>
-        <div className="translate-y-[-10px] rounded-lg bg-white/95 px-2 py-1 text-[11px] font-medium text-black shadow">
-          {label}
-        </div>
-      </Html>
-      {open && (
-        <Html distanceFactor={6} position={[0.12, 0.12, 0]} transform>
-          <div className="max-w-[220px] rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 p-3 text-[12px] text-black shadow">
-            <div className="font-semibold mb-1">{label}</div>
-            <div className="text-black/70 dark:text-neutral-400">{description}</div>
-          </div>
-        </Html>
-      )}
-    </group>
-  );
-}
+// AnnotationDot removed.
 
 /* ------------------------- Other pages (stubs) ----------------------- */
 function StructuresPage() {
