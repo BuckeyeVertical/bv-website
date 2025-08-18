@@ -103,18 +103,25 @@ function Header({ overlay }: { overlay: boolean }) {
       className={[
         "z-50",
         overlay
-          ? "fixed top-4 left-4 right-4 h-16"
-          : "sticky top-0 h-16 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10",
+          ? "fixed top-4 left-4 right-4 h-40"
+          : "sticky top-0 h-20 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10",
       ].join(" ")}
     >
       <div className="mx-auto max-w-7xl flex items-center justify-between px-3 sm:px-6 h-full">
         {/* Left: Logo + TOC */}
         <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-3" aria-label="Buckeye Vertical  Home">
-            {/* Rounded square background so transparent logo is visible */}
-            <div className="w-20 h-14 rounded-md flex items-center justify-center bg-neutral-50 border border-black/10 shadow-sm p-1">
-              <img src="/logo.svg" alt="Buckeye Vertical logo" className="h-full w-auto object-contain" />
-            </div>
+          <Link to="/" className="flex items-center" aria-label="Buckeye Vertical Home">
+            {/* Transparent logo (light/dark swap) */}
+            <img
+              src="/logo.svg"
+              alt="Buckeye Vertical logo"
+              className={[overlay ? "h-40" : "h-20", "w-auto object-contain dark:hidden"].join(" ")}
+            />
+            <img
+              src="/logo_white.png"
+              alt="Buckeye Vertical logo"
+              className={[overlay ? "h-40" : "h-20", "w-auto object-contain hidden dark:inline"].join(" ")}
+            />
             <span className="sr-only">Buckeye Vertical</span>
           </Link>
           <nav className="hidden md:flex flex-wrap gap-2 ml-2">
@@ -206,26 +213,16 @@ function Home() {
           src={HERO.image}
           alt="Buckeye Vertical drone in flight"
         />
-        {/* gradient for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/70" />
+  {/* Stronger gradient tint at the TOP for legibility */}
+  <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
+  {/* Subtle bottom tint for grounding */}
+  <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/30 via-black/20 to-transparent" />
 
-        {/* Headline bottom-left (Figure vibe) */}
+        {/* Bottom headline with motto */}
         <div className="relative z-10 h-full flex items-end">
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="max-w-2xl text-white">
-              <h1 className="text-4xl sm:text-5xl font-semibold leading-tight">
-                {HERO.headline}
-              </h1>
-              <p className="mt-3 text-white/90">{HERO.tagline}</p>
-              <div className="mt-5 flex items-center gap-3">
-                <Link
-                  to={HERO.primaryCta.to}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-                >
-                  {HERO.primaryCta.label} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white">Buckeye Vertical</h1>
+            <p className="mt-3 text-white/90 text-xl sm:text-2xl md:text-3xl max-w-6xl">{HERO.tagline}</p>
           </div>
         </div>
       </section>
@@ -687,7 +684,7 @@ function LectureSeries() {
               </button>
             </form>
           )}
-          <p className="mt-2 text-xs text-black/50">We’ll only use your email to send lecture announcements.</p>
+          <p className="mt-2 text-xs text-black/50 dark:text-white">We’ll only use your email to send lecture announcements.</p>
         </div>
       </section>
 
@@ -977,7 +974,7 @@ function GetInvolved() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="font-medium">Monday</div>
-                <div className="text-black/70">Avionics</div>
+                <div className="text-black/70 dark:text-neutral-300">Avionics</div>
               </div>
               <div className="font-medium">6PM–8PM</div>
             </div>
@@ -985,7 +982,7 @@ function GetInvolved() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="font-medium">Tuesday</div>
-                <div className="text-black/70">Software</div>
+                <div className="text-black/70 dark:text-neutral-300">Software</div>
               </div>
               <div className="font-medium">6PM–8PM</div>
             </div>
@@ -993,16 +990,16 @@ function GetInvolved() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="font-medium">Wednesday</div>
-                <div className="text-black/70">Full Team</div>
+                <div className="text-black/70 dark:text-neutral-300">Full Team</div>
               </div>
               <div className="font-medium">6PM–8PM</div>
             </div>
 
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-medium">Thursday</div>
-                <div className="text-black/70">Structures</div>
-              </div>
+                <div className="text-black/80 dark:text-neutral-200 font-medium">Thursday</div>
+                <div className="text-black/70 dark:text-neutral-300">Structures</div>
+              </div> 
               <div className="font-medium">6PM–8PM</div>
             </div>
           </div>
