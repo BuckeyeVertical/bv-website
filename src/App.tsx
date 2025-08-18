@@ -125,16 +125,26 @@ function Header({ overlay }: { overlay: boolean }) {
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center" aria-label="Buckeye Vertical Home">
             {/* Transparent logo (light/dark swap) */}
-            <img
-              src="/logo.svg"
-              alt="Buckeye Vertical logo"
-              className={[overlay && !scrolled ? "h-40" : "h-20", "w-auto object-contain dark:hidden"].join(" ")}
-            />
-            <img
-              src="/logo_white.png"
-              alt="Buckeye Vertical logo"
-              className={[overlay && !scrolled ? "h-40" : "h-20", "w-auto object-contain hidden dark:inline"].join(" ")}
-            />
+            {(() => {
+              const size = overlay && !scrolled ? "h-40" : "h-20";
+              const showWhiteInLight = overlay && !scrolled; // show white logo in light mode until navbar background appears
+              return (
+                <>
+                  {/* Standard logo (light mode after scroll / non-overlay); always hidden in dark mode */}
+                  <img
+                    src="/logo.svg"
+                    alt="Buckeye Vertical logo"
+                    className={[size, "w-auto object-contain", showWhiteInLight ? "hidden" : "inline", "dark:hidden"].join(" ")}
+                  />
+                  {/* White logo (light mode before scroll on hero overlay); also used for dark mode at all times */}
+                  <img
+                    src="/logo_white.png"
+                    alt="Buckeye Vertical logo"
+                    className={[size, "w-auto object-contain", showWhiteInLight ? "inline" : "hidden", "dark:inline"].join(" ")}
+                  />
+                </>
+              );
+            })()}
             <span className="sr-only">Buckeye Vertical</span>
           </Link>
           <nav className="hidden md:flex flex-wrap gap-2 ml-2">
@@ -234,11 +244,30 @@ function Home() {
         {/* Bottom headline with motto */}
         <div className="relative z-10 h-full flex items-end">
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start">
               <span className="mt-1 block h-12 sm:h-14 md:h-16 w-1.5 bg-[#C8102E] rounded-full" />
-              <div>
-                <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white">Buckeye Vertical</h1>
-                <p className="mt-3 text-white/90 text-xl sm:text-2xl md:text-3xl max-w-6xl">{HERO.tagline}</p>
+              <div className="overflow-hidden">
+                <motion.div
+                  initial="hidden"
+                  animate="show"
+                  variants={{ show: { transition: { staggerChildren: 0.12 } } }}
+                  className="ml-4"
+                >
+                  <motion.h1
+                    className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white"
+                    variants={{ hidden: { x: -40, opacity: 0 }, show: { x: 0, opacity: 1 } }}
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                  >
+                    Buckeye Vertical
+                  </motion.h1>
+                  <motion.p
+                    className="mt-3 text-white/90 text-xl sm:text-2xl md:text-3xl max-w-6xl"
+                    variants={{ hidden: { x: -40, opacity: 0 }, show: { x: 0, opacity: 1 } }}
+                    transition={{ type: "spring", stiffness: 120, damping: 22, delay: 0.05 }}
+                  >
+                    {HERO.tagline}
+                  </motion.p>
+                </motion.div>
               </div>
             </div>
           </div>
