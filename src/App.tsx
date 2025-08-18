@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, useMemo, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Cpu, Cog, CircuitBoard, X } from "lucide-react";
