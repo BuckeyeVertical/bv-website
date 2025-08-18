@@ -56,7 +56,7 @@ import { PAST_SEASONS } from "./data";
  *
  * NOTE: place your hero image at /public/hero.jpg (or update the src in data.ts)
  */
-export default function App() {
+function App() {
   return (
     <Router>
       <Layout />
@@ -98,16 +98,29 @@ function Layout() {
 
 function Header({ overlay }: { overlay: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      // Consider past banner when scrolling beyond ~90% of viewport height (hero is ~92vh)
+      setScrolled(window.scrollY > window.innerHeight * 0.9);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
     <header
       className={[
         "z-50",
         overlay
-          ? "fixed top-4 left-4 right-4 h-40"
+          ? scrolled
+            ? "fixed top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10"
+    : "fixed top-4 left-0 right-4 h-40"
           : "sticky top-0 h-20 bg-white/90 backdrop-blur border-b border-black/10 dark:bg-neutral-950/80 dark:border-white/10",
       ].join(" ")}
     >
-      <div className="mx-auto max-w-7xl flex items-center justify-between px-3 sm:px-6 h-full">
+  <div className="mx-auto max-w-7xl flex items-center justify-between pl-0 pr-3 sm:pl-2 sm:pr-6 h-full">
         {/* Left: Logo + TOC */}
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center" aria-label="Buckeye Vertical Home">
@@ -115,12 +128,12 @@ function Header({ overlay }: { overlay: boolean }) {
             <img
               src="/logo.svg"
               alt="Buckeye Vertical logo"
-              className={[overlay ? "h-40" : "h-20", "w-auto object-contain dark:hidden"].join(" ")}
+              className={[overlay && !scrolled ? "h-40" : "h-20", "w-auto object-contain dark:hidden"].join(" ")}
             />
             <img
               src="/logo_white.png"
               alt="Buckeye Vertical logo"
-              className={[overlay ? "h-40" : "h-20", "w-auto object-contain hidden dark:inline"].join(" ")}
+              className={[overlay && !scrolled ? "h-40" : "h-20", "w-auto object-contain hidden dark:inline"].join(" ")}
             />
             <span className="sr-only">Buckeye Vertical</span>
           </Link>
@@ -221,8 +234,13 @@ function Home() {
         {/* Bottom headline with motto */}
         <div className="relative z-10 h-full flex items-end">
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pb-8">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white">Buckeye Vertical</h1>
-            <p className="mt-3 text-white/90 text-xl sm:text-2xl md:text-3xl max-w-6xl">{HERO.tagline}</p>
+            <div className="flex items-start gap-4">
+              <span className="mt-1 block h-12 sm:h-14 md:h-16 w-1.5 bg-[#C8102E] rounded-full" />
+              <div>
+                <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white">Buckeye Vertical</h1>
+                <p className="mt-3 text-white/90 text-xl sm:text-2xl md:text-3xl max-w-6xl">{HERO.tagline}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -501,6 +519,7 @@ function DetailRow({
   bullets,
   image,
   alt,
+  embedUrl,
   reverse,
 }: DetailSection & { reverse?: boolean }) {
   return (
@@ -509,7 +528,19 @@ function DetailRow({
       {reverse ? (
         <div className="order-2 md:order-1">
           <div className="aspect-[16/10] w-full overflow-hidden rounded-xl border border-black/10 bg-black/[0.02] dark:bg-white/[0.04]">
-            <img src={image} alt={alt} className="h-full w-full object-cover" />
+            {embedUrl ? (
+              <iframe
+                className="h-full w-full"
+                src={embedUrl}
+                title={alt}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            ) : (
+              <img src={image} alt={alt} className="h-full w-full object-cover" />
+            )}
           </div>
         </div>
       ) : null}
@@ -528,7 +559,19 @@ function DetailRow({
       {!reverse ? (
         <div className="order-2">
           <div className="aspect-[16/10] w-full overflow-hidden rounded-xl border border-black/10 bg-black/[0.02] dark:bg-white/[0.04]">
-            <img src={image} alt={alt} className="h-full w-full object-cover" />
+            {embedUrl ? (
+              <iframe
+                className="h-full w-full"
+                src={embedUrl}
+                title={alt}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            ) : (
+              <img src={image} alt={alt} className="h-full w-full object-cover" />
+            )}
           </div>
         </div>
       ) : null}
@@ -577,12 +620,26 @@ function LectureSeries() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    // TODO: Wire to your provider (Formspree/Brevo/Google Form)
-    setSubmitted(true);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "lecture-series" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok && !data?.already) {
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Subscription error:", err);
+      setSubmitted(true); // keep friction low; optionally show a toast with err.message
+    }
   };
+
 
   return (
     <PageShell title="Lecture Series">
@@ -697,8 +754,7 @@ function LectureSeries() {
               <p className="mt-2 text-sm text-black/70 dark:text-neutral-400 max-w-2xl">We welcome industry speakers from aerospace, robotics, and AI. Share tech deep dives, career paths, and real-world lessons with our members.</p>
             </div>
             <div className="flex gap-3">
-              <Link to="/partners" className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-5 py-2 text-sm font-medium text-white hover:opacity-90">Become a Host <ArrowRight className="h-4 w-4" /></Link>
-              <Link to="/get-involved" className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 px-5 py-2 text-sm font-medium hover:bg-black/[0.03]">Contact Us</Link>
+              <a href="mailto:buckeyevertical@buckeyemail.osu.edu?subject=Lecture%20Host%20Inquiry" className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-5 py-2 text-sm font-medium text-white hover:opacity-90">Become a Host <ArrowRight className="h-4 w-4" /></a>
             </div>
           </div>
         </div>
@@ -863,6 +919,8 @@ function StructuresPage() {
     </PageShell>
   );
 }
+
+export default App;
 function SoftwarePage() {
   return (
     <PageShell title="Software">
@@ -952,12 +1010,12 @@ function Partners() {
   {/* Sponsors row removed per request - logos hidden */}
 
       <div className="mt-12 flex justify-center">
-        <Link
-          to="/get-involved"
+        <a
+          href="mailto:buckeyevertical@buckeyemail.osu.edu?subject=Sponsor%20Inquiry"
           className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
         >
           We're looking for sponsors
-        </Link>
+        </a>
       </div>
     </PageShell>
   );

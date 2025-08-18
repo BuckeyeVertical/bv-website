@@ -62,7 +62,7 @@ export const HOME_JOIN = {
   to: "/get-involved",
 } as const;
 
-export type DetailSection = { title: string; bullets: string[]; image: string; alt: string };
+export type DetailSection = { title: string; bullets: string[]; image: string; alt: string; embedUrl?: string };
 export type Details = {
   sections: DetailSection[];
   skills?: string[];
@@ -172,7 +172,7 @@ export const SUBTEAM_DETAILS: Record<SubteamKey, Details> = {
     ],
     lead: {
       name: "Vignesh Ganji",
-      role: "Junior in Mechanical Engineering",
+      role: "Senior in Mechanical Engineering",
       email: "ganji.5@buckeyemail.osu.edu",
     },
   },
@@ -186,7 +186,7 @@ export const SUBTEAM_DETAILS: Record<SubteamKey, Details> = {
           "Develop localization to estimate precise latitude/longitude of targets",
           "Generate a synthetic dataset (12k+ variants) via domain randomization",
         ],
-        image: "/software-object-detection.jpg",
+        image: "/software-obj-det.jpg",
         alt: "Object detection and target localization",
       },
       {
@@ -196,11 +196,21 @@ export const SUBTEAM_DETAILS: Record<SubteamKey, Details> = {
           "Process LiDAR and Time‑of‑Flight data for obstacle avoidance and payload operations",
           "Airspace awareness and safe routing",
         ],
-        image: "/software-avoidance.jpg",
+  image: "/software-avoidance.jpg",
+  embedUrl: "https://www.youtube.com/embed/_pt2vKJa-Ro?si=UMZIuJjTZh_upX27",
         alt: "Path planning and obstacle avoidance",
       },
+      { 
+        title: "Mapping",
+        bullets: [
+          "Developing algorithms to stitch a high-fidelity map of the ground based on images taken from high-resolution camera",
+          "Engineering protocols to remotely transfer the map from the flight to the ground station",
+        ],
+        image: "/software-mapping.jpg",
+        alt: "Mapping",
+      },
       {
-        title: "Software Integration",
+        title: "Flight Software",
         bullets: [
           "Compose algorithms into a cohesive autonomous mission stack",
           "Unit and integration tests in simulation to ensure reliability",
@@ -222,7 +232,7 @@ export const SUBTEAM_DETAILS: Record<SubteamKey, Details> = {
     ],
     lead: {
       name: "Eashan Vytla",
-      role: "Sophomore in Computer Science Engineering",
+      role: "Junior in Computer Science Engineering",
       email: "vytla.4@buckeyemail.osu.edu",
     },
   },
@@ -268,7 +278,7 @@ export const SUBTEAM_DETAILS: Record<SubteamKey, Details> = {
     ],
     lead: {
       name: "Garva Patel",
-      role: "Senior in Aerospace Engineering",
+      role: "Senior in Mechanical Engineering",
       email: "patel.4739@buckeyemail.osu.edu",
     },
   },
