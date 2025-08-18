@@ -35,7 +35,7 @@ import {
 import { PAST_SEASONS } from "./data";
 // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
-import { Html, useProgress, OrbitControls } from "@react-three/drei";
+import { Html, useProgress } from "@react-three/drei";
 // GLB loader
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -80,7 +80,7 @@ function Layout() {
         <Route path="/subteams" element={<Subteams />} />
         <Route path="/lecture-series" element={<LectureSeries />} />
         <Route path="/news" element={<NewsPage />} />
-        <Route path="/air-brutus-1" element={<AirBrutus />} />
+        {/* <Route path="/air-brutus-1" element={<AirBrutus />} /> */}
         <Route path="/past-seasons" element={<PastSeasons />} />
         <Route path="/partners" element={<Partners />} />
         <Route path="/get-involved" element={<GetInvolved />} />
@@ -736,119 +736,119 @@ function NewsPage() {
   );
 }
 
-/* ------------------------- Air Brutus 1 (GLB + annotations) ---------- */
-function AirBrutus() {
-  const [focusIndex, setFocusIndex] = useState<number | null>(null);
+// /* ------------------------- Air Brutus 1 (GLB + annotations) ---------- */
+// function AirBrutus() {
+//   const [focusIndex, setFocusIndex] = useState<number | null>(null);
 
-  return (
-    <PageShell title="Air Brutus 1">
-      <div className="rounded-2xl border border-black/10 overflow-hidden">
-        <div className="relative aspect-[16/9] w-full bg-black/[0.02] dark:bg-white/[0.04]">
-          <Suspense fallback={<CenterNote>Loading 3D model…</CenterNote>}>
-            <Canvas camera={{ position: [0, 0.5, 3.5], fov: 55 }}>
-              <LoaderOverlay />
-              <ambientLight intensity={0.7} />
-              <directionalLight position={[4, 4, 4]} intensity={0.7} />
+//   return (
+//     <PageShell title="Air Brutus 1">
+//       <div className="rounded-2xl border border-black/10 overflow-hidden">
+//         <div className="relative aspect-[16/9] w-full bg-black/[0.02] dark:bg-white/[0.04]">
+//           <Suspense fallback={<CenterNote>Loading 3D model…</CenterNote>}>
+//             <Canvas camera={{ position: [0, 0.5, 3.5], fov: 55 }}>
+//               <LoaderOverlay />
+//               <ambientLight intensity={0.7} />
+//               <directionalLight position={[4, 4, 4]} intensity={0.7} />
 
-              {/* Scene content lives inside Canvas so R3F hooks are valid */}
-              <AirBrutusScene focusIndex={focusIndex} onFocus={setFocusIndex} />
-            </Canvas>
-          </Suspense>
-          {focusIndex !== null && (
-            <button
-              onClick={() => setFocusIndex(null)}
-              className="absolute top-3 right-3 rounded-md bg-white/90 dark:bg-neutral-900/80 border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs"
-            >
-              Reset view
-            </button>
-          )}
-        </div>
-      </div>
-      <p className="mt-4 text-sm text-black/60 dark:text-neutral-500">Click a dot to focus on a component and see its description.</p>
-    </PageShell>
-  );
-}
+//               {/* Scene content lives inside Canvas so R3F hooks are valid */}
+//               <AirBrutusScene focusIndex={focusIndex} onFocus={setFocusIndex} />
+//             </Canvas>
+//           </Suspense>
+//           {focusIndex !== null && (
+//             <button
+//               onClick={() => setFocusIndex(null)}
+//               className="absolute top-3 right-3 rounded-md bg-white/90 dark:bg-neutral-900/80 border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs"
+//             >
+//               Reset view
+//             </button>
+//           )}
+//         </div>
+//       </div>
+//       <p className="mt-4 text-sm text-black/60 dark:text-neutral-500">Click a dot to focus on a component and see its description.</p>
+//     </PageShell>
+//   );
+// }
 
-function AirBrutusScene({ focusIndex, onFocus }: { focusIndex: number | null; onFocus: (i: number) => void }) {
-  const modelUrl = import.meta.env.VITE_MODEL_URL ?? "/air-brutus-1.glb";
-  const gl = useThree((s) => s.gl);
-  const gltf = useLoader(GLTFLoader, modelUrl, (ldr) => {
-    const draco = new DRACOLoader();
-    draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-    (ldr as GLTFLoader).setDRACOLoader(draco);
+// function AirBrutusScene({ focusIndex, onFocus }: { focusIndex: number | null; onFocus: (i: number) => void }) {
+//   const modelUrl = import.meta.env.VITE_MODEL_URL ?? "/air-brutus-1.glb";
+//   const gl = useThree((s) => s.gl);
+//   const gltf = useLoader(GLTFLoader, modelUrl, (ldr) => {
+//     const draco = new DRACOLoader();
+//     draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+//     (ldr as GLTFLoader).setDRACOLoader(draco);
 
-    const ktx2 = new KTX2Loader();
-    ktx2.setTranscoderPath("https://www.gstatic.com/basis-universal/1.0.0/");
-    try { (ktx2 as any).detectSupport?.(gl); } catch {}
-    (ldr as any).setKTX2Loader?.(ktx2);
+//     const ktx2 = new KTX2Loader();
+//     ktx2.setTranscoderPath("https://www.gstatic.com/basis-universal/1.0.0/");
+//     try { (ktx2 as any).detectSupport?.(gl); } catch {}
+//     (ldr as any).setKTX2Loader?.(ktx2);
 
-    (ldr as any).setMeshoptDecoder?.(MeshoptDecoder as any);
+//     (ldr as any).setMeshoptDecoder?.(MeshoptDecoder as any);
     
-  }) as GLTF;
+//   }) as GLTF;
 
-  // Normalize scene: center and scale so camera/annotations align
-  const norm = useMemo(() => {
-    const scene = gltf.scene.clone(true);
-    const box = new Box3().setFromObject(scene);
-    const c = box.getCenter(new Vector3());
-    const size = box.getSize(new Vector3());
-    const r = Math.max(size.x, size.y, size.z) * 0.5 || 1;
-    const scale = 1.2 / r;
-    scene.position.sub(c);
-    scene.scale.setScalar(scale);
-    const transform = (p: [number, number, number]) => (
-      [(p[0] - c.x) * scale, (p[1] - c.y) * scale, (p[2] - c.z) * scale] as [number, number, number]
-    );
-    return { scene, transform };
-  }, [gltf]);
-
-
-  const defaultView = useMemo(
-    () => ({ pos: [0, 0.5, 3.5] as [number, number, number], target: [0, 0, 0] as [number, number, number] }),
-    []
-  );
+//   // Normalize scene: center and scale so camera/annotations align
+//   const norm = useMemo(() => {
+//     const scene = gltf.scene.clone(true);
+//     const box = new Box3().setFromObject(scene);
+//     const c = box.getCenter(new Vector3());
+//     const size = box.getSize(new Vector3());
+//     const r = Math.max(size.x, size.y, size.z) * 0.5 || 1;
+//     const scale = 1.2 / r;
+//     scene.position.sub(c);
+//     scene.scale.setScalar(scale);
+//     const transform = (p: [number, number, number]) => (
+//       [(p[0] - c.x) * scale, (p[1] - c.y) * scale, (p[2] - c.z) * scale] as [number, number, number]
+//     );
+//     return { scene, transform };
+//   }, [gltf]);
 
 
-  return (
-    <>
-      {/* Normalized GLB scene */}
-      <primitive object={norm.scene} />
+//   const defaultView = useMemo(
+//     () => ({ pos: [0, 0.5, 3.5] as [number, number, number], target: [0, 0, 0] as [number, number, number] }),
+//     []
+//   );
 
-      {/* Annotations in normalized space */}
-      {tAnn.map((a, idx) => (
-        <AnnotationDot
-          key={a.label + idx}
-          annotation={{ label: a.label, description: a.description, position: a.tpos as [number, number, number] }}
-          onFocus={() => onFocus(idx)}
-        />
-      ))}
 
-      {/* Camera controller */}
-      <CameraRig view={focusIndex === null ? defaultView : focusStops[focusIndex]} />
-    </>
-  );
-}
+//   return (
+//     <>
+//       {/* Normalized GLB scene */}
+//       <primitive object={norm.scene} />
 
-// CameraRig and AnnotationDot removed — AirBrutus page uses OrbitControls only.
+//       {/* Annotations in normalized space */}
+//       {tAnn.map((a, idx) => (
+//         <AnnotationDot
+//           key={a.label + idx}
+//           annotation={{ label: a.label, description: a.description, position: a.tpos as [number, number, number] }}
+//           onFocus={() => onFocus(idx)}
+//         />
+//       ))}
 
-function CenterNote({ children }: { children: ReactNode }) {
-  return (
-    <div className="absolute inset-0 grid place-items-center text-sm text-black/60 dark:text-neutral-500">{children}</div>
-  );
-}
+//       {/* Camera controller */}
+//       <CameraRig view={focusIndex === null ? defaultView : focusStops[focusIndex]} />
+//     </>
+//   );
+// }
 
-function LoaderOverlay() {
-  const { active, progress, item, errors } = useProgress();
-  if (!active && (!errors || errors.length === 0)) return null;
-  return (
-    <Html center>
-      <div className="rounded-lg bg-white/90 dark:bg-neutral-900/90 px-3 py-2 text-xs text-black dark:text-white shadow">
-        {active ? `Loading… ${Math.round(progress)}%` : "Failed to load model (check VITE_MODEL_URL or /air-brutus-1.glb)"}
-        {item ? <div className="mt-1 opacity-70">{item}</div> : null}
-      </div>
-    </Html>
-  );
-}
+// // CameraRig and AnnotationDot removed — AirBrutus page uses OrbitControls only.
+
+// function CenterNote({ children }: { children: ReactNode }) {
+//   return (
+//     <div className="absolute inset-0 grid place-items-center text-sm text-black/60 dark:text-neutral-500">{children}</div>
+//   );
+// }
+
+// function LoaderOverlay() {
+//   const { active, progress, item, errors } = useProgress();
+//   if (!active && (!errors || errors.length === 0)) return null;
+//   return (
+//     <Html center>
+//       <div className="rounded-lg bg-white/90 dark:bg-neutral-900/90 px-3 py-2 text-xs text-black dark:text-white shadow">
+//         {active ? `Loading… ${Math.round(progress)}%` : "Failed to load model (check VITE_MODEL_URL or /air-brutus-1.glb)"}
+//         {item ? <div className="mt-1 opacity-70">{item}</div> : null}
+//       </div>
+//     </Html>
+//   );
+// }
 
 // AnnotationDot removed.
 
