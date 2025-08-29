@@ -30,7 +30,7 @@ import {
   type LectureStat,
   type FeaturedCompany,
   type LectureNewsItem,
-  SLACK_URL,
+  GROUPME_URL,
 } from "./data";
 import { PAST_SEASONS } from "./data";
 // // 3D viewer deps (install: npm i three @react-three/fiber @react-three/drei)
@@ -1101,12 +1101,12 @@ function GetInvolved() {
 
           <div className="mt-6">
             <a
-              href={SLACK_URL}
+              href={GROUPME_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
             >
-              Join our Slack
+              Join our GroupMe
             </a>
           </div>
         </div>

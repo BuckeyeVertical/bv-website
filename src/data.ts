@@ -433,4 +433,4 @@ export const PAST_SEASONS: PastSeason[] = [
   },
 ];
 
-export const SLACK_URL = "https://join.slack.com/t/buckeyevertical/shared_invite/zt-3bk9wc7no-~KXUdzrydYj3aD7urxEaXQ";
+export const GROUPME_URL = "https://groupme.com/join_group/109585496/EOFNlWHO";
