@@ -1060,16 +1060,8 @@ function GetInvolved() {
           <div className="mt-4 space-y-4 text-sm text-black/80 dark:text-neutral-200">
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-medium">Monday</div>
-                <div className="text-black/70 dark:text-neutral-300">Avionics</div>
-              </div>
-              <div className="font-medium">6PM–8PM</div>
-            </div>
-
-            <div className="flex items-start justify-between">
-              <div>
                 <div className="font-medium">Tuesday</div>
-                <div className="text-black/70 dark:text-neutral-300">Software</div>
+                <div className="text-black/70 dark:text-neutral-300">Avionics</div>
               </div>
               <div className="font-medium">6PM–8PM</div>
             </div>
@@ -1088,6 +1080,14 @@ function GetInvolved() {
                 <div className="text-black/70 dark:text-neutral-300">Structures</div>
               </div> 
               <div className="font-medium">6PM–8PM</div>
+            </div>
+
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-medium">Software</div>
+                <div className="text-black/70 dark:text-neutral-300">TBD</div>
+              </div>
+              <div className="font-medium text-black/50 dark:text-neutral-500">TBD</div>
             </div>
           </div>
 
