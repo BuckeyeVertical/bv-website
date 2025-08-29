@@ -172,7 +172,7 @@ function Header({ overlay }: { overlay: boolean }) {
             to="/get-involved"
             className="inline-flex items-center gap-2 rounded-xl bg-[#C8102E] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
-            Get Involved <ArrowRight className="h-4 w-4" />
+            Get involved <ArrowRight className="h-4 w-4" /> <div className=""></div>
           </Link>
         </div>
       </div>
